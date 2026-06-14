@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Activity, AlertTriangle, TrendingUp, PackageSearch, ArrowRight, Zap } from 'lucide-react';
+import { Search, Mail, Bell, ArrowUpRight, Plus, Download, ChevronUp, BarChart2, Calendar, Target, LayoutGrid } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
     const [stats, setStats] = useState<any>(null);
     const [aiPreds, setAiPreds] = useState<any[]>([]);
+    const [alerts, setAlerts] = useState<any[]>([]);
+    const [showNotifications, setShowNotifications] = useState(false);
 
     useEffect(() => {
         axios.get('http://localhost:5000/api/v1/scm/dashboard/usage-stats')
@@ -14,6 +16,10 @@ const Dashboard = () => {
 
         axios.get('http://localhost:5000/api/v1/scm/ai/predict-demand')
             .then(res => setAiPreds(res.data))
+            .catch(console.error);
+
+        axios.get('http://localhost:5000/api/v1/scm/stocks/alerts')
+            .then(res => setAlerts(res.data))
             .catch(console.error);
     }, []);
 
@@ -30,103 +36,221 @@ const Dashboard = () => {
     };
 
     const metricCards = [
-        { title: "Total Pengeluaran", value: stats ? formatCurrency(stats.total_expense) : "Menghitung...", icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-100" },
-        { title: "Bahan Menipis", value: stats ? `${stats.low_stock_items} Item` : "Menghitung...", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-100" },
-        { title: "Performa Supplier", value: stats ? `${stats.supplier_performance}%` : "Menghitung...", icon: Activity, color: "text-emerald-600", bg: "bg-emerald-100" },
-        { title: "Total Dapur Aktif", value: stats ? `${stats.active_kitchens} Titik` : "Menghitung...", icon: PackageSearch, color: "text-purple-600", bg: "bg-purple-100" },
+        { 
+            title: "Total Pengeluaran", 
+            value: stats ? formatCurrency(stats.total_expense) : "---", 
+            change: "12%", 
+            statusLabel: "Increased from last week",
+            bg: "bg-[#1E5A44]", 
+            text: "text-white", 
+            titleColor: "text-emerald-50",
+            arrowBg: "bg-white/20 text-white",
+            badgeBg: "bg-emerald-400 text-[#1E5A44]",
+            badgeIcon: <ChevronUp className="w-3 h-3" />
+        },
+        { 
+            title: "Bahan Menipis", 
+            value: stats ? `${stats.low_stock_items}` : "-", 
+            change: "2", 
+            statusLabel: "Needs restock Soon",
+            bg: "bg-white border border-[#F3F4F6]", 
+            text: "text-slate-900", 
+            titleColor: "text-slate-800 font-bold",
+            arrowBg: "bg-white border border-slate-200 text-slate-800",
+            badgeBg: "bg-amber-100 text-amber-700",
+            badgeIcon: <Target className="w-3 h-3" />
+        },
+        { 
+            title: "Performa Supplier", 
+            value: stats ? `${stats.supplier_performance}%` : "-", 
+            change: "5%", 
+            statusLabel: "Increased from last month",
+            bg: "bg-white border border-[#F3F4F6]", 
+            text: "text-slate-900", 
+            titleColor: "text-slate-800 font-bold",
+            arrowBg: "bg-white border border-slate-200 text-slate-800",
+            badgeBg: "bg-emerald-100 text-emerald-700",
+            badgeIcon: <ChevronUp className="w-3 h-3" />
+        },
+        { 
+            title: "Dapur Aktif", 
+            value: stats ? `${stats.active_kitchens}` : "-", 
+            change: "On Active", 
+            statusLabel: "Fully Operational",
+            bg: "bg-white border border-[#F3F4F6]", 
+            text: "text-slate-900", 
+            titleColor: "text-slate-800 font-bold",
+            arrowBg: "bg-white border border-slate-200 text-slate-800",
+            badgeBg: "bg-emerald-100 text-emerald-700",
+            badgeIcon: <LayoutGrid className="w-3 h-3" />
+        },
     ];
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <header className="flex justify-between flex-wrap gap-4 items-end">
-                <div>
-                    <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight drop-shadow-sm">Dashboard Overview</h1>
-                    <p className="text-slate-500 mt-2 font-medium">Pemantauan logistik real-time dan analitik bahan dapur cerdas.</p>
+        <div className="space-y-8 pb-10">
+            {/* Dashboard Header */}
+            <header className="flex justify-between flex-wrap gap-6 items-center bg-gradient-to-br from-[#123F2E] to-[#1E5A44] p-8 xl:p-10 rounded-[2rem] text-white shadow-2xl relative border border-[#1E5A44] mt-2">
+                {/* Background Decor */}
+                <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+                    <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/20 rounded-full blur-[70px] -translate-y-1/2 translate-x-1/2"></div>
                 </div>
-                <div className="bg-white/60 backdrop-blur-lg border border-white px-5 py-2.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-sm font-bold text-indigo-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse ring-4 ring-indigo-500/20"></span>
-                    Live Sync Active
+                
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">Dashboard</h1>
+                    <p className="text-emerald-100/80 text-[15px] font-medium">Pantau, prioritaskan, dan kelola aktivitas logistik Anda dengan mudah.</p>
+                </div>
+
+                {/* Notifications & Messages inside Dashboard Header */}
+                <div className="relative z-20 flex items-center gap-3 bg-white/10 p-2 rounded-2xl shadow-sm border border-white/10 backdrop-blur-sm">
+                    <button className="p-2.5 rounded-xl hover:bg-white/20 transition-colors border border-transparent">
+                        <Mail className="w-5 h-5 text-emerald-50" />
+                    </button>
+                    <div className="relative">
+                        <button 
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            className={`p-2.5 rounded-xl transition-colors border ${showNotifications ? 'bg-white/20 border-white/20' : 'hover:bg-white/20 border-transparent'}`}
+                        >
+                            {alerts.length > 0 && (
+                                <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[#1E5A44] animate-pulse shadow-sm"></div>
+                            )}
+                            <Bell className="w-5 h-5 text-emerald-50" />
+                        </button>
+
+                        {/* Notifications Dropdown */}
+                        {showNotifications && (
+                            <div className="absolute top-full right-0 mt-4 w-80 bg-white rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.2)] border border-slate-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 text-left">
+                                <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                                    <h3 className="font-bold text-slate-800 text-sm">Notifikasi</h3>
+                                    <span className="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-0.5 rounded-full">{alerts.length} Baru</span>
+                                </div>
+                                <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                                    {alerts.length > 0 ? (
+                                        alerts.map((alert, idx) => (
+                                            <div key={idx} className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
+                                                <div className="flex items-start gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                                                        <Target className="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[13px] text-slate-800 font-bold mb-0.5">Stok Menipis: {alert.name}</p>
+                                                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                                                            Sisa stok <strong>{alert.qty_available}</strong> (Minimal: {alert.min_stock_level}). Segera lakukan pemesanan ulang untuk mencegah kekurangan.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-8 text-center text-slate-400">
+                                            <Bell className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+                                            <p className="text-sm font-medium">Tidak ada notifikasi baru</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="p-3 border-t border-slate-100 text-center bg-slate-50">
+                                    <button className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors">Lihat Semua</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Metrik Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 {metricCards.map((stat, i) => (
-                    <div key={i} className="bg-white/70 backdrop-blur-xl rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white flex flex-col justify-between overflow-hidden relative group hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(59,130,246,0.1)] transition-all duration-500 cursor-default">
-                        <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full mix-blend-multiply opacity-40 transition-transform duration-700 group-hover:scale-[2.5] ${stat.bg.replace('100', '200')}`}></div>
-                        <div className="flex items-center gap-4 relative z-10 transition-transform duration-300 group-hover:translate-x-1">
-                            <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} bg-opacity-60 ring-1 ring-white shadow-inner flex items-center justify-center`}>
-                                <stat.icon className={`w-7 h-7 drop-shadow-sm`} />
+                    <div key={i} className="group bg-white border border-[#F3F4F6] text-slate-900 hover:bg-[#1E5A44] hover:text-white hover:border-[#1E5A44] hover:shadow-xl rounded-[2rem] p-6 overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1">
+                        <div className="flex justify-between items-start mb-4">
+                            <span className="text-[15px] text-slate-800 font-bold group-hover:text-emerald-50 transition-colors">{stat.title}</span>
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white border border-slate-200 text-slate-800 group-hover:bg-white/20 group-hover:text-white group-hover:border-transparent transition-colors">
+                                <ArrowUpRight className="w-4 h-4" strokeWidth={2.5} />
                             </div>
-                            <div>
-                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{stat.title}</p>
-                                <p className={`text-3xl font-extrabold text-slate-800 tracking-tight ${!stats ? 'animate-pulse text-transparent bg-slate-200 rounded w-24 h-8' : ''}`}>{stat.value}</p>
+                        </div>
+                        
+                        <div>
+                            <p className="text-5xl font-black tracking-tighter mb-4 transition-colors">{stat.value}</p>
+                            <div className="flex items-center gap-2">
+                                <span className={`${stat.badgeBg} group-hover:bg-emerald-400 group-hover:text-[#1E5A44] flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded shadow-sm transition-colors`}>
+                                    {stat.badgeIcon}
+                                    {stat.change}
+                                </span>
+                                <span className="text-xs text-slate-400 font-medium group-hover:text-emerald-100/80 transition-colors">
+                                    {stat.statusLabel}
+                                </span>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                <div className="xl:col-span-2 bg-white/70 backdrop-blur-2xl rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-100 transition-colors duration-1000"></div>
+            {/* Area Grafik & AI */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Grafik (Analytics Box) */}
+                <div className="xl:col-span-2 bg-white rounded-[2rem] p-8 border border-[#F3F4F6] shadow-sm">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-xl font-bold text-slate-800">Logistics Analytics</h2>
+                        <button className="text-slate-400 hover:text-slate-600 transition-colors">
+                            <BarChart2 className="w-6 h-6" />
+                        </button>
+                    </div>
                     
-                    <h2 className="text-xl font-extrabold text-slate-800 mb-8 flex items-center gap-3 relative z-10">
-                        <div className="p-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shadow-sm">
-                            <TrendingUp className="w-5 h-5" />
-                        </div>
-                        Grafik Penggunaan Bahan
-                    </h2>
-                    
-                    <div className="h-[350px] w-full relative z-10">
+                    <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                                 <defs>
-                                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.4}/>
-                                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                                    <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#1E5A44" stopOpacity={0.6}/>
+                                        <stop offset="95%" stopColor="#1E5A44" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.6} />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 600 }} dy={15} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 600 }} dx={-15} />
+                                <CartesianGrid strokeDasharray="5 5" vertical={false} stroke="#F3F4F6" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 12, fontWeight: 500 }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 12, fontWeight: 500 }} />
                                 <Tooltip 
-                                    cursor={{ stroke: '#94a3b8', strokeWidth: 2, strokeDasharray: '5 5' }} 
-                                    contentStyle={{ borderRadius: '20px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '16px 24px', fontWeight: 'bold', color: '#1e293b' }}
-                                    itemStyle={{ color: '#4f46e5', fontWeight: 900, fontSize: '1.25rem' }}
+                                    cursor={{ stroke: '#D1D5DB', strokeWidth: 1, strokeDasharray: '5 5' }} 
+                                    contentStyle={{ borderRadius: '1rem', border: '1px solid #E5E7EB', background: '#ffffff', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', padding: '12px 16px', fontWeight: 'bold', color: '#1F2937' }}
+                                    itemStyle={{ color: '#1E5A44', fontWeight: 800, fontSize: '1.1rem' }}
                                 />
-                                <Area type="monotone" dataKey="value" stroke="#4f46e5" strokeWidth={5} fillOpacity={1} fill="url(#colorValue)" activeDot={{ r: 8, stroke: '#fff', strokeWidth: 4, fill: '#4f46e5', style: { filter: 'drop-shadow(0px 4px 8px rgba(79, 70, 229, 0.6))' } }} />
+                                <Area type="monotone" dataKey="value" stroke="#1E5A44" strokeWidth={4} fill="url(#colorGreen)" activeDot={{ r: 6, stroke: '#fff', strokeWidth: 3, fill: '#1E5A44' }} />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] p-8 shadow-2xl text-white relative overflow-hidden group border border-slate-700/50">
-                    <div className="absolute -right-10 -top-10 w-56 h-56 bg-blue-500 rounded-full blur-[70px] opacity-40 group-hover:scale-125 transition-transform duration-1000"></div>
-                    <div className="absolute -left-10 -bottom-10 w-56 h-56 bg-emerald-500 rounded-full blur-[70px] opacity-20 group-hover:scale-125 transition-transform duration-1000"></div>
-                    
-                    <h2 className="text-2xl font-extrabold mb-1 relative z-10 flex items-center gap-3">
-                        <Zap className="w-6 h-6 text-amber-400 fill-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]" />
-                        AI Prediksi Mingguan
-                    </h2>
-                    <p className="text-indigo-200/70 text-xs font-black uppercase tracking-[0.2em] mb-8 relative z-10">M.2.5 Forecast Model</p>
-
-                    <div className="space-y-4 relative z-10">
-                        {aiPreds.map((pred, i) => (
-                            <div key={i} className="bg-white/5 p-5 rounded-2xl border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors cursor-default shadow-lg shadow-black/10">
-                                <div className="flex justify-between items-center mb-3">
-                                    <span className="font-bold text-lg tracking-wide">{pred.material}</span>
-                                    <span className="text-emerald-400 font-extrabold bg-emerald-400/10 border border-emerald-400/20 px-3 py-1.5 rounded-xl text-sm shadow-[0_0_15px_rgba(52,211,153,0.15)]">
-                                        {pred.predicted_qty} {pred.unit}
-                                    </span>
+                {/* AI / Reminders Box */}
+                <div className="bg-white rounded-[2rem] p-8 border border-[#F3F4F6] shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-slate-800">AI Prediksi Mingguan</h2>
+                            <button className="text-slate-400 hover:text-slate-600 transition-colors">
+                                <Calendar className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            {aiPreds.length > 0 ? aiPreds.map((pred, i) => (
+                                <div key={i} className="flex justify-between items-center pb-4 border-b border-[#F3F4F6] last:border-0 last:pb-0">
+                                    <div>
+                                        <p className="font-bold text-slate-800 text-[15px] mb-1">{pred.material}</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded">Actionable</span>
+                                            <p className="text-[11px] text-slate-400 font-medium">{pred.reason}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[#1E5A44] font-black text-lg">{pred.predicted_qty}</p>
+                                        <p className="text-slate-400 text-[10px] uppercase font-bold">{pred.unit}</p>
+                                    </div>
                                 </div>
-                                <p className="text-sm text-slate-300 font-medium leading-relaxed">{pred.reason}</p>
-                            </div>
-                        ))}
+                            )) : (
+                                <div className="text-slate-400 text-sm font-medium py-4 text-center">Belum ada prediksi minggu ini.</div>
+                            )}
+                        </div>
                     </div>
 
-                    <button className="mt-10 flex items-center justify-center group gap-2 w-full text-sm font-bold bg-white text-slate-900 py-4 rounded-xl hover:bg-slate-100 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:-translate-y-1 relative z-10">
-                        Lihat Analitik Lengkap
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                    <button className="w-full mt-8 bg-[#1E5A44] hover:bg-[#164232] text-white py-3.5 rounded-2xl flex items-center justify-center gap-2 font-bold transition-colors shadow-lg shadow-emerald-900/20">
+                        <Download className="w-4 h-4" strokeWidth={3} />
+                        Unduh Laporan Prediksi
                     </button>
                 </div>
             </div>

@@ -18,7 +18,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
     return (
         <div className="min-h-screen flex bg-white font-sans">
             {/* Left Panel */}
-            <div className="hidden lg:flex lg:w-1/2 bg-slate-900 p-16 flex-col justify-between text-white relative overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#123F2E] to-[#1E5A44] p-16 flex-col justify-between text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
                 
@@ -31,7 +31,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                         Halo, Admin<br />SCM - MBG!
                     </h1>
                     
-                    <div className="space-y-4 text-blue-50 text-lg leading-relaxed">
+                    <div className="space-y-4 text-emerald-50 text-lg leading-relaxed">
                         <p>
                             <span className="text-2xl mr-2">👋</span> Program <strong>Makan Bergizi Gratis (MBG)</strong> adalah langkah strategis dalam menciptakan generasi sehat dan cerdas melalui jaminan asupan nutrisi sekolah harian anak-anak Indonesia.
                         </p>
@@ -42,15 +42,15 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
                     <div className="flex items-center gap-4 mt-8 pt-8">
                         <div className="flex -space-x-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-300 border-2 border-indigo-600 flex items-center justify-center text-xs font-bold text-indigo-900 z-30">U1</div>
-                            <div className="w-10 h-10 rounded-full bg-blue-200 border-2 border-indigo-600 flex items-center justify-center text-xs font-bold text-indigo-900 z-20">U2</div>
-                            <div className="w-10 h-10 rounded-full bg-indigo-300 border-2 border-indigo-600 flex items-center justify-center text-xs font-bold text-indigo-900 z-10">U3</div>
+                            <div className="w-10 h-10 rounded-full bg-emerald-300 border-2 border-teal-600 flex items-center justify-center text-xs font-bold text-teal-900 z-30">U1</div>
+                            <div className="w-10 h-10 rounded-full bg-emerald-200 border-2 border-teal-600 flex items-center justify-center text-xs font-bold text-teal-900 z-20">U2</div>
+                            <div className="w-10 h-10 rounded-full bg-teal-300 border-2 border-teal-600 flex items-center justify-center text-xs font-bold text-teal-900 z-10">U3</div>
                         </div>
-                        <p className="text-sm font-medium text-blue-100 italic">Bergabung dengan 500+ admin aktif<br />hari ini.</p>
+                        <p className="text-sm font-medium text-emerald-100 italic">Bergabung dengan 500+ admin aktif<br />hari ini.</p>
                     </div>
                 </div>
 
-                <div className="relative z-10 text-blue-200 text-sm font-medium">
+                <div className="relative z-10 text-emerald-200 text-sm font-medium">
                     &copy; 2026 SCM - MBG. Hak Cipta Dilindungi.
                 </div>
             </div>
@@ -60,10 +60,10 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                 <div className="max-w-md w-full space-y-8 animate-in fade-in zoom-in-95 duration-500">
                     <div className="text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-6">
-                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
                                 <ShoppingCart className="w-4 h-4 text-white" />
                             </div>
-                            <span className="font-bold text-blue-600 tracking-wide text-xl">SCM - MBG</span>
+                            <span className="font-bold text-emerald-600 tracking-wide text-xl">SCM - MBG</span>
                         </div>
                         <h2 className="text-3xl font-extrabold text-slate-900">Selamat Datang Kembali!</h2>
                         <p className="text-slate-500 mt-2 font-medium">Silakan masukkan kredensial Anda untuk mengakses dashboard admin.</p>
@@ -87,7 +87,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none font-medium text-slate-800"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none font-medium text-slate-800"
                                         placeholder="admin@scm-mbg.id"
                                     />
                                 </div>
@@ -102,7 +102,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none font-medium text-slate-800"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none font-medium text-slate-800"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -111,15 +111,15 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
                         <div className="flex items-center justify-between text-sm">
                             <label className="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
                                 <span className="text-slate-600 font-medium group-hover:text-slate-800 transition-colors">Ingat saya</span>
                             </label>
-                            <a href="#" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">Lupa Kata Sandi?</a>
+                            <a href="#" className="font-bold text-emerald-600 hover:text-emerald-700 hover:underline">Lupa Kata Sandi?</a>
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5"
+                            className="w-full flex items-center justify-center gap-2 bg-[#1E5A44] hover:bg-[#164232] text-white py-3.5 rounded-xl font-bold shadow-[0_8px_20px_rgba(30,90,68,0.2)] transition-all hover:-translate-y-0.5"
                         >
                             Masuk ke Dashboard
                             <ArrowRight className="w-5 h-5 ml-1" />
@@ -147,7 +147,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                             <span className="w-5 h-5 rounded-full border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold text-[10px]">?</span> 
                             Butuh bantuan?
                         </span>
-                        <a href="#" className="font-bold text-slate-800 hover:text-blue-600 transition-colors">Hubungi Admin Pusat</a>
+                        <a href="#" className="font-bold text-slate-800 hover:text-emerald-600 transition-colors">Hubungi Admin Pusat</a>
                     </div>
                 </div>
             </div>
