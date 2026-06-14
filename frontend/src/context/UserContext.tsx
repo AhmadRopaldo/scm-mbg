@@ -1,6 +1,6 @@
 import { createContext, useState, type ReactNode, useContext } from 'react';
 
-export type UserRole = 'Admin Pusat' | 'Admin Dapur Gudang A' | 'Admin Dapur Gudang B' | 'Admin Dapur Gudang C' | string;
+export type UserRole = 'Admin Pusat' | 'Pemilik Yayasan' | 'Admin Dapur Gudang A' | 'Admin Dapur Gudang B' | 'Admin Dapur Gudang C' | string;
 
 export interface UserProfile {
     name: string;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, Activity, FileClock, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Activity, FileClock, LogOut, ChevronRight, ClipboardList, CheckSquare } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import ProfileModal from './ProfileModal';
 
@@ -8,9 +8,14 @@ const Sidebar = ({ onLogout }: { onLogout?: () => void }) => {
     const { profile } = useUser();
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-    const menuItems = [
+    const isPemilik = profile.role === 'Pemilik Yayasan';
+    const menuItems = isPemilik ? [
+        { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
+        { name: 'Persetujuan Vendor/PO', icon: CheckSquare, path: '/pemilik/approval' },
+    ] : [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
         { name: 'Bahan Baku', icon: Package, path: '/materials' },
+        { name: 'Input Stok Harian', icon: ClipboardList, path: '/daily-input' },
         { name: 'Stok Dapur', icon: Activity, path: '/stocks' },
         { name: 'Riwayat Aset', icon: FileClock, path: '/logs' },
         { name: 'Pemasok Lokal', icon: Users, path: '/suppliers' },

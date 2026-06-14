@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { ShoppingCart, Lock, Mail, ArrowRight } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
+    const { updateProfile } = useUser();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -9,6 +11,18 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if ((email === 'admin@gmail.com' || email === 'admin@scm-mbg.id') && password === '12345') {
+            updateProfile({
+                name: 'Admin Utama',
+                email: email,
+                role: 'Admin Pusat'
+            });
+            onLogin(); // Validated!
+        } else if ((email === 'pemilik@gmail.com' || email === 'pemilik@scm-mbg.id') && password === '12345') {
+            updateProfile({
+                name: 'H. Rahmat Hidayat',
+                email: email,
+                role: 'Pemilik Yayasan'
+            });
             onLogin(); // Validated!
         } else {
             setError('Email atau password salah!');

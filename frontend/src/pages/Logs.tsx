@@ -53,7 +53,7 @@ const Logs = () => {
                     className={`flex items-center gap-2.5 px-6 py-3 rounded-xl font-bold transition-all duration-300 ${activeTab === 'out' ? 'bg-white text-emerald-600 shadow-[0_2px_15px_rgba(0,0,0,0.05)] border border-slate-100 scale-100' : 'text-slate-500 hover:bg-white/40 border border-transparent scale-95 hover:scale-100'}`}
                 >
                     <ArrowUpRight className="w-5 h-5 drop-shadow-sm" />
-                    Barang Keluar (Ke Dapur)
+                    Barang Keluar (Keluar Dapur / Terpakai)
                 </button>
             </div>
 
@@ -121,7 +121,7 @@ const Logs = () => {
                                     <td className="p-5 last:rounded-r-2xl">
                                         <span className="flex items-center gap-1 font-bold text-slate-800 bg-white border border-slate-100 shadow-sm px-4 py-2 rounded-xl max-w-max">
                                             <span className="text-xs text-slate-400 mr-1 font-medium">Rp</span>
-                                            {Number(log.qty * 15000).toLocaleString('id-ID')}
+                                            {Number(log.qty * (log.standard_price || 15000)).toLocaleString('id-ID')}
                                         </span>
                                     </td>
                                 </tr>

@@ -85,6 +85,18 @@ async function initDb() {
             FOREIGN KEY (stock_id) REFERENCES m2_kitchen_stocks(id) ON DELETE CASCADE
         )`);
 
+        await pool.query(`CREATE TABLE IF NOT EXISTS m2_purchase_orders (
+            id VARCHAR(255) PRIMARY KEY,
+            supplier_id VARCHAR(255) NOT NULL,
+            material_id VARCHAR(255) NOT NULL,
+            qty DECIMAL(10, 2) NOT NULL,
+            total_price DECIMAL(15, 2),
+            order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status VARCHAR(255) DEFAULT 'Pending',
+            FOREIGN KEY (supplier_id) REFERENCES m2_suppliers(id),
+            FOREIGN KEY (material_id) REFERENCES m2_materials(id)
+        )`);
+
         // Seed dummy data
         const [rows] = await pool.query("SELECT COUNT(*) AS count FROM m2_materials");
         if (rows[0].count === 0) {
@@ -112,12 +124,12 @@ async function initDb() {
                     ['sup-5', 'UD Ayam Sehat', 'Pasar Daging Sentral', '081234567805', 'active', 4.7, '2026-03-10', '2027-03-10', 'Daging Ayam Potong'],
                     ['sup-6', 'Grosir Sembako Bunda', 'Jl. Ahmad Yani No 12', '085678901206', 'inactive', 3.8, '2025-05-15', '2026-05-15', 'Minyak Goreng Kemasan, Beras'],
                     ['sup-7', 'UD Minyak Harapan', 'Sektor Pergudangan', '081234567807', 'active', 4.4, '2026-01-05', '2027-01-05', 'Minyak Goreng Kemasan'],
-                    ['sup-8', 'CV Pangan Lestari', 'Jl. Pahlawan 88', '085678901208', 'active', 4.6, '2026-04-01', '2027-04-01', 'Kacang Hijau, Bumbu'],
+                    ['sup-8', 'CV Pangan Lestari', 'Jl. Pahlawan 88', '085678901208', 'Menunggu Approval', 4.6, '2026-04-01', '2027-04-01', 'Kacang Hijau, Bumbu'],
                     ['sup-9', 'KUD Sumber Makmur', 'Desa Sukamaju', '081234567809', 'active', 4.9, '2026-02-10', '2027-02-10', 'Kentang Dieng, Beras'],
                     ['sup-10', 'PT Telur Nusantara', 'Jalur Lintas Provinsi', '085678901210', 'active', 4.3, '2026-03-01', '2027-03-01', 'Telur Ayam Ras'],
                     ['sup-11', 'BUMDes Sejahtera', 'Balai Desa Pusat', '081234567811', 'active', 4.8, '2026-01-15', '2027-01-15', 'Beras, Sayur Lokal'],
                     ['sup-12', 'Toko Bawang Super', 'Pasar Induk Blok B', '085678901212', 'blacklisted', 2.1, '2025-01-10', '2025-12-31', 'Bawang Merah, Bawang Putih'],
-                    ['sup-13', 'Grosir Susu Anak', 'Ruko Mutiara 5', '081234567813', 'active', 4.5, '2026-03-15', '2027-03-15', 'Susu UHT Full Cream'],
+                    ['sup-13', 'Grosir Susu Anak', 'Ruko Mutiara 5', '081234567813', 'Menunggu Approval', 4.5, '2026-03-15', '2027-03-15', 'Susu UHT Full Cream'],
                     ['sup-14', 'UD Tani Jaya', 'Jl. Trans Sumatera', '085678901214', 'active', 4.1, '2026-04-10', '2027-04-10', 'Kacang Hijau, Kentang']
                 ]
             ]);
@@ -146,8 +158,33 @@ async function initDb() {
                     ['log-5', 'k-1', 'mat-3', 'waste', 5, 'Sortir kualitas daging potong', '-']
                 ]
             ]);
+
             console.log('10 Materials & 14 Suppliers Dummy data seeded');
         }
+
+        const [poRows] = await pool.query("SELECT COUNT(*) AS count FROM m2_purchase_orders");
+        if (poRows[0].count === 0) {
+            await pool.query(`INSERT INTO m2_purchase_orders (id, supplier_id, material_id, qty, total_price, status) VALUES ?`, [
+                [
+                    ['po-1', 'sup-1', 'mat-1', 500, 7750000, 'Completed'],
+                    ['po-2', 'sup-2', 'mat-2', 200, 5700000, 'Completed'],
+                    ['po-3', 'sup-4', 'mat-5', 50, 1600000, 'Menunggu Approval'],
+                    ['po-4', 'sup-5', 'mat-3', 150, 5400000, 'Menunggu Approval'],
+                    ['po-5', 'sup-7', 'mat-4', 100, 1850000, 'Completed'],
+                    ['po-6', 'sup-9', 'mat-8', 300, 5400000, 'Menunggu Approval'],
+                    ['po-7', 'sup-13', 'mat-9', 200, 4200000, 'Menunggu Approval'],
+                    ['po-8', 'sup-3', 'mat-7', 100, 1200000, 'Completed'],
+                    ['po-9', 'sup-10', 'mat-2', 150, 4275000, 'Menunggu Approval'],
+                    ['po-10', 'sup-14', 'mat-10', 80, 1800000, 'Completed']
+                ]
+            ]);
+            console.log('Dummy data seeded for POs');
+        }
+
+        // Force update statuses for testing, in case DB is already initialized
+        await pool.query("UPDATE m2_suppliers SET status = 'Menunggu Approval' WHERE id IN ('sup-8', 'sup-13')");
+        await pool.query("UPDATE m2_purchase_orders SET status = 'Menunggu Approval' WHERE id IN ('po-3', 'po-4', 'po-6', 'po-7', 'po-9')");
+        console.log('Force updated supplier/PO statuses for Pemilik Yayasan testing');
     } catch (err) {
         console.error('Error initializing database:', err);
     }
