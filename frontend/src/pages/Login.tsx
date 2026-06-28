@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ShoppingCart, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useUser } from '../context/UserContext';
-import axios from 'axios';
+import axios from '../services/api';
 
 const Login = ({ onLogin, onToggleRegister, successMsg, clearSuccessMsg }: { 
     onLogin: () => void; 
@@ -36,7 +36,7 @@ const Login = ({ onLogin, onToggleRegister, successMsg, clearSuccessMsg }: {
         setLoading(true);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/v1/auth/login', {
+            const res = await axios.post('/api/v1/auth/login', {
                 email,
                 password
             });

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
@@ -24,8 +24,8 @@ const PemilikDashboard = () => {
     const fetchData = async () => {
       try {
         const [suppliersRes, poRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/v1/scm/suppliers'),
-          axios.get('http://localhost:5000/api/v1/scm/purchase-orders')
+          axios.get('/api/v1/scm/suppliers'),
+          axios.get('/api/v1/scm/purchase-orders')
         ]);
         setSuppliers(suppliersRes.data);
         setPurchaseOrders(poRes.data);

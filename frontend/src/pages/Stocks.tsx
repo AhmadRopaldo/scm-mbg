@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { Activity, BellRing, RefreshCw, Filter, Menu, AlertTriangle, Info, Grid, Leaf, Droplet, Database, Circle, Package, X, Trash2, History, AlertCircle, Plus, ClipboardList } from 'lucide-react';
 
 const getNutritionData = (name: string, category: string) => {
@@ -99,7 +99,7 @@ const Stocks = () => {
     }, [selectedKitchen]);
 
     const fetchStocks = () => {
-        axios.get(`http://localhost:5000/api/v1/scm/stocks/kitchen/${selectedKitchen}`)
+        axios.get(`/api/v1/scm/stocks/kitchen/${selectedKitchen}`)
             .then(res => setStocks(res.data))
             .catch(console.error);
     };
@@ -107,7 +107,7 @@ const Stocks = () => {
     const handleSync = () => {
         setIsSyncing(true);
         // Simulate a network request to sync from main warehouse
-        axios.get(`http://localhost:5000/api/v1/scm/stocks/kitchen/${selectedKitchen}`)
+        axios.get(`/api/v1/scm/stocks/kitchen/${selectedKitchen}`)
             .then(res => {
                 setTimeout(() => {
                     setStocks(res.data);
@@ -125,7 +125,7 @@ const Stocks = () => {
     const hasLowStock = stocks.some(stk => stk.qty_available <= stk.min_stock_level);
 
     const fetchWastages = () => {
-        axios.get(`http://localhost:5000/api/v1/scm/wastages`)
+        axios.get(`/api/v1/scm/wastages`)
             .then(res => setWastagesHistory(res.data))
             .catch(console.error);
     };
@@ -141,7 +141,7 @@ const Stocks = () => {
         if (!selectedStockForWastage || !wastageForm.qty_wasted || !wastageForm.reason) return;
         
         setIsSubmittingWastage(true);
-        axios.post(`http://localhost:5000/api/v1/scm/wastages`, {
+        axios.post(`/api/v1/scm/wastages`, {
             stock_id: selectedStockForWastage.id,
             qty_wasted: parseFloat(wastageForm.qty_wasted),
             reason: wastageForm.reason
@@ -161,7 +161,7 @@ const Stocks = () => {
     const handleDeleteWastage = (id: string) => {
         if (!window.confirm('Yakin ingin menghapus riwayat ini? Stok akan dikembalikan.')) return;
         
-        axios.delete(`http://localhost:5000/api/v1/scm/wastages/${id}`)
+        axios.delete(`/api/v1/scm/wastages/${id}`)
         .then(() => {
             fetchWastages();
             fetchStocks();
@@ -174,7 +174,7 @@ const Stocks = () => {
         if (!useForm.kitchen_id || !useForm.material_id || !useForm.qty || !useForm.target_school) return;
 
         setIsSubmittingUse(true);
-        axios.post(`http://localhost:5000/api/v1/scm/stocks/use`, {
+        axios.post(`/api/v1/scm/stocks/use`, {
             kitchen_id: useForm.kitchen_id,
             material_id: useForm.material_id,
             qty: parseFloat(useForm.qty),

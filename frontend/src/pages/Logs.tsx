@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { FileClock, ArrowUpRight, ArrowDownRight, Search, CalendarClock, MapPin } from 'lucide-react';
 
 const Logs = () => {
@@ -8,7 +8,7 @@ const Logs = () => {
     const [activeTab, setActiveTab] = useState<'in' | 'out'>('in');
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/v1/scm/inventory-logs')
+        axios.get('/api/v1/scm/inventory-logs')
             .then(res => setLogs(res.data))
             .catch(console.error);
     }, []);

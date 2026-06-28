@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ShoppingCart, Lock, Mail, ArrowRight, User, ShieldCheck } from 'lucide-react';
-import axios from 'axios';
+import axios from '../services/api';
 
 const Register = ({ onToggleLogin, onRegisterSuccess }: { onToggleLogin: () => void; onRegisterSuccess: (msg: string) => void }) => {
     const [name, setName] = useState('');
@@ -22,7 +22,7 @@ const Register = ({ onToggleLogin, onRegisterSuccess }: { onToggleLogin: () => v
 
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5000/api/v1/auth/register', {
+            const res = await axios.post('/api/v1/auth/register', {
                 name,
                 email,
                 password,

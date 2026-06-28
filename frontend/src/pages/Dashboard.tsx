@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Bell, ArrowUpRight, ChevronUp, Target, LayoutGrid, ChefHat, ShoppingBag, Sparkles } from 'lucide-react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
@@ -14,19 +14,19 @@ const Dashboard = () => {
     const [stocksData, setStocksData] = useState<any[]>([]);
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/v1/scm/dashboard/usage-stats')
+        axios.get('/api/v1/scm/dashboard/usage-stats')
             .then(res => setStats(res.data))
             .catch(console.error);
 
-        axios.get('http://localhost:5000/api/v1/scm/stocks/alerts')
+        axios.get('/api/v1/scm/stocks/alerts')
             .then(res => setAlerts(res.data))
             .catch(console.error);
 
-        axios.get('http://localhost:5000/api/v1/scm/ai/expiry-menu-planner')
+        axios.get('/api/v1/scm/ai/expiry-menu-planner')
             .then(res => setPlannerData(res.data))
             .catch(console.error);
 
-        axios.get('http://localhost:5000/api/v1/scm/stocks/kitchen/k-1')
+        axios.get('/api/v1/scm/stocks/kitchen/k-1')
             .then(res => setStocksData(res.data))
             .catch(console.error);
     }, []);

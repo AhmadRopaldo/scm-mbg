@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { Users, Star, MapPin, Phone, Package, Plus, X, CheckCircle2, Search, CalendarClock, FileText, DollarSign, Trophy, Mail } from 'lucide-react';
 
 const Suppliers = () => {
@@ -63,13 +63,13 @@ const Suppliers = () => {
     }, []);
 
     const fetchSuppliers = () => {
-        axios.get('http://localhost:5000/api/v1/scm/suppliers')
+        axios.get('/api/v1/scm/suppliers')
             .then(res => setSuppliers(res.data))
             .catch(console.error);
     };
 
     const fetchMaterials = () => {
-        axios.get('http://localhost:5000/api/v1/scm/materials')
+        axios.get('/api/v1/scm/materials')
             .then(res => setMaterials(res.data))
             .catch(console.error);
     };
@@ -92,7 +92,7 @@ const Suppliers = () => {
             return;
         }
         setAiLoading(true);
-        axios.get(`http://localhost:5000/api/v1/scm/ai/supplier-match?material_id=${createPOForm.material_id}`)
+        axios.get(`/api/v1/scm/ai/supplier-match?material_id=${createPOForm.material_id}`)
             .then(res => setAiRecommendations(res.data))
             .catch(err => {
                 console.error('Gagal mengambil rekomendasi AI:', err);
@@ -118,7 +118,7 @@ const Suppliers = () => {
             return;
         }
         setIsCreatingPO(true);
-        axios.post('http://localhost:5000/api/v1/scm/purchase-orders', {
+        axios.post('/api/v1/scm/purchase-orders', {
             ...createPOForm,
             qty: Number(createPOForm.qty),
             status: 'Menunggu Approval'
@@ -153,7 +153,7 @@ const Suppliers = () => {
     };
 
     const handleOpenPOList = () => {
-        axios.get('http://localhost:5000/api/v1/scm/purchase-orders')
+        axios.get('/api/v1/scm/purchase-orders')
             .then(res => {
                 setPurchaseOrders(res.data);
                 setShowPOModal(true);
@@ -163,7 +163,7 @@ const Suppliers = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        axios.post('http://localhost:5000/api/v1/scm/suppliers', formData).then(() => {
+        axios.post('/api/v1/scm/suppliers', formData).then(() => {
             fetchSuppliers();
             setShowAddModal(false);
             showNotification('Vendor berhasil bertambah');
@@ -175,7 +175,7 @@ const Suppliers = () => {
 
     const handleDeletePO = (id: string) => {
         if (!window.confirm('Yakin ingin menghapus Purchase Order ini?')) return;
-        axios.delete(`http://localhost:5000/api/v1/scm/purchase-orders/${id}`)
+        axios.delete(`/api/v1/scm/purchase-orders/${id}`)
             .then(() => {
                 showNotification('PO berhasil dihapus');
                 handleOpenPOList();
@@ -191,7 +191,7 @@ const Suppliers = () => {
     const handleUpdatePO = (e: React.FormEvent) => {
         e.preventDefault();
         setIsUpdatingPO(true);
-        axios.put(`http://localhost:5000/api/v1/scm/purchase-orders/${editingPO.id}`, editPOForm)
+        axios.put(`/api/v1/scm/purchase-orders/${editingPO.id}`, editPOForm)
             .then(() => {
                 setEditingPO(null);
                 showNotification('PO berhasil diupdate');

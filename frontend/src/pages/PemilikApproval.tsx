@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { 
   FileText, 
   Users, 
@@ -37,9 +37,9 @@ const PemilikApproval = () => {
     setLoading(true);
     try {
       const [suppliersRes, poRes, materialsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/v1/scm/suppliers'),
-        axios.get('http://localhost:5000/api/v1/scm/purchase-orders'),
-        axios.get('http://localhost:5000/api/v1/scm/materials')
+        axios.get('/api/v1/scm/suppliers'),
+        axios.get('/api/v1/scm/purchase-orders'),
+        axios.get('/api/v1/scm/materials')
       ]);
       setSuppliers(suppliersRes.data);
       setPurchaseOrders(poRes.data);
@@ -61,7 +61,7 @@ const PemilikApproval = () => {
     setProcessingAction(true);
     const finalStatus = action === 'Setuju' ? 'Completed' : 'Cancelled';
     try {
-      await axios.put(`http://localhost:5000/api/v1/scm/purchase-orders/${poId}`, {
+      await axios.put(`/api/v1/scm/purchase-orders/${poId}`, {
         status: finalStatus
       });
       showNotification('Keputusan berhasil disimpan.');
@@ -80,7 +80,7 @@ const PemilikApproval = () => {
     setProcessingAction(true);
     const finalStatus = action === 'Setuju' ? 'active' : 'blacklisted';
     try {
-      await axios.put(`http://localhost:5000/api/v1/scm/suppliers/${supplierId}`, {
+      await axios.put(`/api/v1/scm/suppliers/${supplierId}`, {
         status: finalStatus
       });
       showNotification('Keputusan berhasil disimpan.');

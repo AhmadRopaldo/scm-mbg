@@ -6,7 +6,8 @@ const dbConfig = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'scm_mbg_db',
-    port: process.env.DB_PORT || 3306
+    port: process.env.DB_PORT || 3306,
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
 };
 
 let pool;
@@ -18,7 +19,8 @@ async function initDb() {
             host: dbConfig.host,
             user: dbConfig.user,
             password: dbConfig.password,
-            port: dbConfig.port
+            port: dbConfig.port,
+            ssl: dbConfig.ssl
         });
         await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
         await connection.end();

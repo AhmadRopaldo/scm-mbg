@@ -922,3 +922,5 @@ app.post('/api/v1/auth/login', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Backend SCM-MBG running on http://localhost:${PORT}`);
 });
+
+module.exports = app;

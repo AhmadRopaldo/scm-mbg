@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { PackageSearch, Plus, Trash2, Edit3, Search, X, CheckCircle2 } from 'lucide-react';
 
 const Materials = () => {
@@ -25,7 +25,7 @@ const Materials = () => {
     }, []);
 
     const fetchMaterials = () => {
-        axios.get('http://localhost:5000/api/v1/scm/materials')
+        axios.get('/api/v1/scm/materials')
             .then(res => {
                 setMaterials(res.data);
                 setLoading(false);
@@ -56,7 +56,7 @@ const Materials = () => {
 
     const handleDelete = (id: string) => {
         if (confirm('Hapus bahan baku ini?')) {
-            axios.delete(`http://localhost:5000/api/v1/scm/materials/${id}`).then(() => {
+            axios.delete(`/api/v1/scm/materials/${id}`).then(() => {
                 fetchMaterials();
                 showNotification('Data berhasil dihapus');
             });
@@ -66,14 +66,14 @@ const Materials = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingId) {
-            axios.put(`http://localhost:5000/api/v1/scm/materials/${editingId}`, formData)
+            axios.put(`/api/v1/scm/materials/${editingId}`, formData)
                 .then(() => {
                     fetchMaterials();
                     setShowModal(false);
                     showNotification('Data berhasil diperbaharui');
                 });
         } else {
-            axios.post('http://localhost:5000/api/v1/scm/materials', formData)
+            axios.post('/api/v1/scm/materials', formData)
                 .then(() => {
                     fetchMaterials();
                     setShowModal(false);

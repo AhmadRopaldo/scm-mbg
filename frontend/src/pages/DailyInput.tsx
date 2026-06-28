@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, RefreshCw, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
@@ -24,7 +24,7 @@ const DailyInput = () => {
 
     const fetchStocks = () => {
         setIsLoading(true);
-        axios.get(`http://localhost:5000/api/v1/scm/stocks/kitchen/${selectedKitchen}`)
+        axios.get(`/api/v1/scm/stocks/kitchen/${selectedKitchen}`)
             .then(res => {
                 setStocks(res.data);
                 setIsLoading(false);
@@ -44,7 +44,7 @@ const DailyInput = () => {
         if (!selectedKitchen || !form.material_id || !form.qty || !form.target_school) return;
 
         setIsSubmitting(true);
-        axios.post(`http://localhost:5000/api/v1/scm/stocks/use`, {
+        axios.post(`/api/v1/scm/stocks/use`, {
             kitchen_id: selectedKitchen,
             material_id: form.material_id,
             qty: parseFloat(form.qty),
