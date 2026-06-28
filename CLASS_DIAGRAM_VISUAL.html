@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Diagram - Sistem SCM Lelang</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .diagram {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .legend-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        .legend-item h3 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .legend-item p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .relation-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e7f3ff;
+            color: #0066cc;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .cardinality {
+            font-family: 'Courier New', monospace;
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Class Diagram Sistem SCM Lelang</h1>
+        <p class="subtitle">Visualisasi relasi class dengan garis lurus dan tata letak yang jelas</p>
+        
+        <div class="diagram">
+            <div class="mermaid">
+classDiagram
+    %% Base Class
+    class Pengguna {
+        -id_pengguna: Int
+        -nama: String
+        -email: String
+        -password: String
+        -created_at: Timestamp
+        -updated_at: Timestamp
+        +login()
+    }
+
+    %% Child Classes - Inheritance
+    class Petugas {
+        -telepon: String
+        -alamat: String
+        -bank: String
+        -no_rekening: String
+        +lelang()
+        +islangsAtAuction()
+    }
+
+    class Admin {
+        -telepon: String
+        -alamat: String
+        -bank: String
+        -no_rekening: String
+        +islangsDislikuii()
+        +barang()
+    }
+
+    class Pemilik {
+        -telepon: String
+        -alamat: String
+        -bank: String
+        -no_rekening: String
+        +islangsDislikuii()
+        +barang()
+    }
+
+    class Penjual {
+        -telepon: String
+        -alamat: String
+        -bank: String
+        -no_rekening: String
+        +islangsDislikuii()
+        +barang()
+    }
+
+    %% Main Entities
+    class Barang {
+        -id_barang: Int
+        -nama_barang: String
+        -harga_awal: Decimal
+        -lokasi: String
+        -deskripsi: Text
+        -kondisi: String
+        -status: String
+        -foto: String
+        -id_penjual: Int
+        -created_at: Timestamp
+        -updated_at: Timestamp
+    }
+
+    class Kategori {
+        -id_kategori: String
+        -nama_kategori: String
+        -created_at: Timestamp
+        -updated_at: Timestamp
+    }
+
+    class Lelang {
+        -id_lelang: Int
+        -id_barang: Int
+        -tgl_dibuka: DateTime
+        -tgl_selesai: DateTime
+        -harga_akhir: Decimal
+        -id_pembeli: Int
+        -status_danis: String
+        -id_pengusul: Int
+    }
+
+    class Penawaran {
+        -id_penawaran: Int
+        -id_lelang: Int
+        -id_pembeli: Int
+        -nominal: Decimal
+        -uang_muka: Decimal
+        -status_lawar: String
+        -bayar_sisa: Decimal
+        -created_at: Timestamp
+        -updated_at: Timestamp
+    }
+
+    class Pencairan_Dana {
+        -id_pencairan: Int
+        -nominal: Decimal
+        -id_lelang: Int
+        -id_penjual: Int
+        -waktu: DateTime
+        -updated_at: Timestamp
+    }
+
+    class Pertanyaan {
+        -id_pertanyaan: Int
+        -id_barang: Int
+        -id_user: Int
+        -status_danis: String
+        -created_at: Timestamp
+        -updated_at: Timestamp
+    }
+
+    class Wastage {
+        -id_wastage: Int
+        -qty_wastage: Decimal
+        -tgl_catat: DateTime
+        -alasan: String
+        -id_barang: Int
+        -harga_standar: Decimal
+    }
+
+    class Dapur {
+        -id_dapur: Int
+        -nama_dapur: String
+        -lokasi: String
+    }
+
+    class Log_Harian {
+        -id_log: Int
+        -qty_keluar: Decimal
+        -tgl_log: DateTime
+        -satuan: String
+        -target_sebolah: Decimal
+    }
+
+    %% Inheritance Relationships
+    Petugas --|> Pengguna
+    Admin --|> Pengguna
+    Pemilik --|> Pengguna
+    Penjual --|> Pengguna
+
+    %% Association Relationships
+    Barang --> Kategori : belongs to
+    Barang --> Penjual : sold by
+    Lelang --> Barang : includes
+    Lelang --> Pengguna : won by
+    Penawaran --> Lelang : for
+    Penawaran --> Pengguna : made by
+    Pencairan_Dana --> Lelang : from
+    Pencairan_Dana --> Penjual : to
+    Pertanyaan --> Barang : about
+    Pertanyaan --> Pengguna : asked by
+    Wastage --> Barang : of
+    Log_Harian --> Dapur : tracked by
+            </div>
+        </div>
+
+        <h2>📋 Tabel Relasi Antar Class</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Class Sumber</th>
+                    <th>Class Target</th>
+                    <th>Jenis Relasi</th>
+                    <th>Cardinality</th>
+                    <th>Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Petugas</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Inheritance</span></td>
+                    <td><span class="cardinality">Extends</span></td>
+                    <td>Petugas mewarisi dari Pengguna</td>
+                </tr>
+                <tr>
+                    <td>Admin</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Inheritance</span></td>
+                    <td><span class="cardinality">Extends</span></td>
+                    <td>Admin mewarisi dari Pengguna</td>
+                </tr>
+                <tr>
+                    <td>Pemilik</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Inheritance</span></td>
+                    <td><span class="cardinality">Extends</span></td>
+                    <td>Pemilik mewarisi dari Pengguna</td>
+                </tr>
+                <tr>
+                    <td>Penjual</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Inheritance</span></td>
+                    <td><span class="cardinality">Extends</span></td>
+                    <td>Penjual mewarisi dari Pengguna</td>
+                </tr>
+                <tr>
+                    <td>Barang</td>
+                    <td>Kategori</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak barang dalam 1 kategori</td>
+                </tr>
+                <tr>
+                    <td>Barang</td>
+                    <td>Penjual</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak barang dijual oleh 1 penjual</td>
+                </tr>
+                <tr>
+                    <td>Lelang</td>
+                    <td>Barang</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak lelang untuk 1 barang</td>
+                </tr>
+                <tr>
+                    <td>Lelang</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak lelang dimenangkan 1 user</td>
+                </tr>
+                <tr>
+                    <td>Penawaran</td>
+                    <td>Lelang</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak penawaran untuk 1 lelang</td>
+                </tr>
+                <tr>
+                    <td>Penawaran</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak penawaran dari 1 pembeli</td>
+                </tr>
+                <tr>
+                    <td>Pencairan_Dana</td>
+                    <td>Lelang</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak pencairan dari 1 lelang</td>
+                </tr>
+                <tr>
+                    <td>Pencairan_Dana</td>
+                    <td>Penjual</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak pencairan kepada 1 penjual</td>
+                </tr>
+                <tr>
+                    <td>Pertanyaan</td>
+                    <td>Barang</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak pertanyaan tentang 1 barang</td>
+                </tr>
+                <tr>
+                    <td>Pertanyaan</td>
+                    <td>Pengguna</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak pertanyaan dari 1 user</td>
+                </tr>
+                <tr>
+                    <td>Wastage</td>
+                    <td>Barang</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak wastage untuk 1 barang</td>
+                </tr>
+                <tr>
+                    <td>Log_Harian</td>
+                    <td>Dapur</td>
+                    <td><span class="relation-type">Association</span></td>
+                    <td><span class="cardinality">M:1</span></td>
+                    <td>Banyak log dicatat di 1 dapur</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="legend">
+            <div class="legend-item">
+                <h3>🔗 Jenis Relasi</h3>
+                <p><strong>Inheritance (--|>):</strong> Pewarisan antar class (generalisasi/spesialisasi)</p>
+                <p><strong>Association (-->):</strong> Asosiasi antar class dengan hubungan M:1 atau 1:1</p>
+            </div>
+            <div class="legend-item">
+                <h3>📊 Cardinality</h3>
+                <p><strong>M:1:</strong> Many-to-One (banyak ke satu)</p>
+                <p><strong>1:1:</strong> One-to-One (satu ke satu)</p>
+                <p><strong>Extends:</strong> Pewarisan/inheritance</p>
+            </div>
+            <div class="legend-item">
+                <h3>📌 Catatan</h3>
+                <p>Garis-garis digambar tegak lurus tanpa belok untuk kejelasan visual</p>
+                <p>Semua relasi sesuai dengan ERD original yang Anda buat</p>
+                <p>FK (Foreign Key) direpresentasikan sebagai asosiasi dalam diagram</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+    </script>
+</body>
+</html>

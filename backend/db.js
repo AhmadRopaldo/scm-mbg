@@ -41,7 +41,8 @@ async function initDb() {
             unit VARCHAR(255) NOT NULL,
             standard_price DECIMAL(10, 2),
             quality_status VARCHAR(255) DEFAULT 'Baik',
-            expiry_date VARCHAR(255)
+            expiry_date VARCHAR(255),
+            incoming_date VARCHAR(255)
         )`);
 
         await pool.query(`CREATE TABLE IF NOT EXISTS m2_suppliers (
@@ -97,21 +98,44 @@ async function initDb() {
             FOREIGN KEY (material_id) REFERENCES m2_materials(id)
         )`);
 
+        await pool.query(`CREATE TABLE IF NOT EXISTS m2_users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            role VARCHAR(255) NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        try {
+            await pool.query(`ALTER TABLE m2_materials ADD COLUMN incoming_date VARCHAR(255)`);
+            console.log("Successfully added incoming_date column to m2_materials");
+        } catch (err) {
+            // Column might already exist, ignore
+        }
+
+        try {
+            await pool.query(`ALTER TABLE m2_users DROP INDEX email`);
+            console.log("Successfully dropped UNIQUE index 'email' from m2_users");
+        } catch (err) {
+            // Index might not exist or already dropped, ignore
+        }
+
         // Seed dummy data
         const [rows] = await pool.query("SELECT COUNT(*) AS count FROM m2_materials");
         if (rows[0].count === 0) {
-            await pool.query(`INSERT INTO m2_materials (id, name, category, unit, standard_price, quality_status, expiry_date) VALUES ?`, [
+            await pool.query(`INSERT INTO m2_materials (id, name, category, unit, standard_price, quality_status, expiry_date, incoming_date) VALUES ?`, [
                 [
-                    ['mat-1', 'Beras Premium', 'karbo', 'kg', 15500, 'Baik', '2026-12-01'],
-                    ['mat-2', 'Telur Ayam Ras', 'protein', 'kg', 28500, 'Sedang', '2026-05-15'],
-                    ['mat-3', 'Daging Ayam Potong', 'protein', 'kg', 36000, 'Baik', '2026-04-10'],
-                    ['mat-4', 'Minyak Goreng Kemasan', 'lainnya', 'liter', 18500, 'Baik', '2027-01-01'],
-                    ['mat-5', 'Bawang Merah', 'bumbu', 'kg', 32000, 'Hampir Expired', '2026-04-15'],
-                    ['mat-6', 'Bawang Putih', 'bumbu', 'kg', 35000, 'Baik', '2026-08-20'],
-                    ['mat-7', 'Wortel Lokal', 'sayur', 'kg', 12000, 'Baik', '2026-04-25'],
-                    ['mat-8', 'Kentang Dieng', 'karbo', 'kg', 18000, 'Sedang', '2026-06-01'],
-                    ['mat-9', 'Susu UHT Full Cream', 'protein', 'liter', 21000, 'Baik', '2026-11-20'],
-                    ['mat-10', 'Kacang Hijau', 'sayur', 'kg', 22500, 'Baik', '2027-05-10']
+                    ['mat-1', 'Beras Premium', 'karbo', 'kg', 15500, 'Baik', '2026-12-01', '2026-06-01'],
+                    ['mat-2', 'Telur Ayam Ras', 'protein', 'kg', 28500, 'Sedang', '2026-06-24', '2026-06-15'],
+                    ['mat-3', 'Daging Ayam Potong', 'protein', 'kg', 36000, 'Baik', '2026-06-21', '2026-06-10'],
+                    ['mat-4', 'Minyak Goreng Kemasan', 'lainnya', 'liter', 18500, 'Baik', '2027-01-01', '2026-06-01'],
+                    ['mat-5', 'Bawang Merah', 'bumbu', 'kg', 32000, 'Hampir Expired', '2026-06-15', '2026-06-05'],
+                    ['mat-6', 'Bawang Putih', 'bumbu', 'kg', 35000, 'Baik', '2026-08-20', '2026-06-10'],
+                    ['mat-7', 'Wortel Lokal', 'sayur', 'kg', 12000, 'Baik', '2026-06-25', '2026-06-18'],
+                    ['mat-8', 'Kentang Dieng', 'karbo', 'kg', 18000, 'Sedang', '2026-06-01', '2026-05-20'],
+                    ['mat-9', 'Susu UHT Full Cream', 'protein', 'liter', 21000, 'Baik', '2026-11-20', '2026-06-15'],
+                    ['mat-10', 'Kacang Hijau', 'sayur', 'kg', 22500, 'Baik', '2027-05-10', '2026-06-01']
                 ]
             ]);
 
@@ -179,6 +203,18 @@ async function initDb() {
                 ]
             ]);
             console.log('Dummy data seeded for POs');
+        }
+
+        // Seed default users
+        const [userRows] = await pool.query("SELECT COUNT(*) AS count FROM m2_users");
+        if (userRows[0].count === 0) {
+            await pool.query(`INSERT INTO m2_users (name, email, password, role) VALUES 
+                ('Admin Utama', 'admin@scm-mbg.id', '12345', 'Admin Pusat'),
+                ('Admin Utama Fallback', 'admin@gmail.com', '12345', 'Admin Pusat'),
+                ('H. Rahmat Hidayat', 'pemilik@scm-mbg.id', '12345', 'Pemilik Yayasan'),
+                ('H. Rahmat Hidayat Fallback', 'pemilik@gmail.com', '12345', 'Pemilik Yayasan')
+            `);
+            console.log('Default users seeded in m2_users');
         }
 
         // Force update statuses for testing, in case DB is already initialized

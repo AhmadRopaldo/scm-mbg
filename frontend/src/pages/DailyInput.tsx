@@ -133,6 +133,80 @@ const DailyInput = () => {
                                 </option>
                             ))}
                         </select>
+
+                        {selectedStockItem && (
+                            <div className="mt-3 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50 flex flex-col sm:flex-row sm:justify-between gap-3 text-xs font-bold text-slate-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-emerald-600">📅</span>
+                                    <span>Tanggal Masuk:</span>
+                                    <span className="text-[#1E5A44] font-black">{selectedStockItem.incoming_date || '-'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-emerald-600">⌛</span>
+                                    <span>Tanggal Kadaluarsa:</span>
+                                    <span className={`${
+                                        (() => {
+                                            const expDate = selectedStockItem.expiry_date;
+                                            if (!expDate) return "text-[#1E5A44] font-black";
+                                            const expiry = new Date(expDate);
+                                            const today = new Date();
+                                            expiry.setHours(0,0,0,0);
+                                            today.setHours(0,0,0,0);
+                                            if (expiry < today) return "text-rose-600 font-black animate-pulse";
+                                            
+                                            const diffTime = expiry.getTime() - today.getTime();
+                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                            if (diffDays <= 3) return "text-amber-600 font-black";
+                                            return "text-[#1E5A44] font-black";
+                                        })()
+                                    }`}>{selectedStockItem.expiry_date || '-'}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {selectedStockItem && (() => {
+                            const expDate = selectedStockItem.expiry_date;
+                            if (!expDate) return null;
+                            const expiry = new Date(expDate);
+                            const today = new Date();
+                            expiry.setHours(0,0,0,0);
+                            today.setHours(0,0,0,0);
+                            
+                            if (expiry < today) {
+                                return (
+                                    <div className="mt-3 p-4 bg-rose-50 border border-rose-200/60 rounded-2xl text-xs font-bold text-rose-700 flex items-center gap-3 shadow-sm animate-in fade-in duration-300">
+                                        <div className="p-2 bg-rose-100 rounded-xl text-rose-600">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-extrabold text-sm text-rose-800">PERINGATAN: BAHAN BAKU SUDAH KADALUARSA!</p>
+                                            <p className="text-rose-600/90 font-medium mt-0.5">Bahan baku ini telah melewati batas kadaluarsa pada {selectedStockItem.expiry_date}. Harap lakukan pengecekan kualitas fisik sebelum digunakan!</p>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            
+                            const diffTime = expiry.getTime() - today.getTime();
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            if (diffDays >= 0 && diffDays <= 3) {
+                                return (
+                                    <div className="mt-3 p-4 bg-amber-50 border border-amber-200/60 rounded-2xl text-xs font-bold text-amber-700 flex items-center gap-3 shadow-sm animate-in fade-in duration-300">
+                                        <div className="p-2 bg-amber-100 rounded-xl text-amber-600">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-extrabold text-sm text-amber-800">PERINGATAN: BAHAN BAKU HAMPIR KADALUARSA!</p>
+                                            <p className="text-amber-600/90 font-medium mt-0.5">Bahan baku ini akan kadaluarsa dalam {diffDays} hari lagi ({selectedStockItem.expiry_date}). Disarankan untuk segera diprioritaskan.</p>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })()}
                     </div>
 
                     {/* Jumlah Terpakai */}

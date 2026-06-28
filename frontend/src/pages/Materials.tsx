@@ -16,7 +16,8 @@ const Materials = () => {
         unit: 'kg',
         standard_price: '',
         quality_status: 'Baik',
-        expiry_date: ''
+        expiry_date: '',
+        incoming_date: ''
     });
 
     useEffect(() => {
@@ -34,7 +35,16 @@ const Materials = () => {
 
     const handleOpenAdd = () => {
         setEditingId(null);
-        setFormData({ id: `mat-${Date.now().toString().slice(-4)}`, name: '', category: 'sayur', unit: 'kg', standard_price: '', quality_status: 'Baik', expiry_date: new Date().toISOString().split('T')[0] });
+        setFormData({ 
+            id: `mat-${Date.now().toString().slice(-4)}`, 
+            name: '', 
+            category: 'sayur', 
+            unit: 'kg', 
+            standard_price: '', 
+            quality_status: 'Baik', 
+            expiry_date: new Date().toISOString().split('T')[0], 
+            incoming_date: new Date().toISOString().split('T')[0] 
+        });
         setShowModal(true);
     };
 
@@ -136,13 +146,17 @@ const Materials = () => {
                                     <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Harga HET (Rp)</label>
                                     <input type="number" value={formData.standard_price} onChange={e => setFormData({ ...formData, standard_price: e.target.value })} className="w-full px-5 py-3 bg-white/60 border border-white shadow-sm rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium" required />
                                 </div>
-                                <div>
+                                <div className="col-span-2">
                                     <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Kualitas Bahan</label>
                                     <select value={formData.quality_status} onChange={e => setFormData({ ...formData, quality_status: e.target.value })} className="w-full px-5 py-3 bg-white/60 border border-white shadow-sm rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium">
                                         <option value="Baik">Baik (Hijau)</option>
                                         <option value="Sedang">Sedang (Kuning)</option>
                                         <option value="Hampir Expired">Hampir Expired (Merah)</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Masuk</label>
+                                    <input type="date" value={formData.incoming_date} onChange={e => setFormData({ ...formData, incoming_date: e.target.value })} className="w-full px-5 py-3 bg-white/60 border border-white shadow-sm rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium" required />
                                 </div>
                                 <div>
                                     <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Kedaluwarsa</label>
@@ -201,13 +215,14 @@ const Materials = () => {
                                 <th className="p-5 font-black uppercase tracking-widest">Harga HET</th>
                                 <th className="p-5 font-black uppercase tracking-widest">Kualitas</th>
                                 <th className="p-5 font-black uppercase tracking-widest">Nilai Gizi</th>
+                                <th className="p-5 font-black uppercase tracking-widest">Tgl Masuk</th>
                                 <th className="p-5 font-black uppercase tracking-widest">Kedaluwarsa</th>
                                 <th className="p-5 font-black uppercase tracking-widest text-right rounded-tr-2xl">Aksi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100/50 text-slate-700">
                             {loading ? (
-                                <tr><td colSpan={9} className="p-12 text-center text-slate-500 font-medium animate-pulse">Memuat data logistik...</td></tr>
+                                <tr><td colSpan={10} className="p-12 text-center text-slate-500 font-medium animate-pulse">Memuat data logistik...</td></tr>
                             ) : materials.map((item, idx) => (
                                 <tr key={item.id} className="hover:bg-white/80 transition-all duration-300 group even:bg-white/30 odd:bg-transparent rounded-xl animate-in fade-in slide-in-from-bottom-2" style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}>
                                     <td className="p-5 font-mono text-xs text-slate-400 font-bold group-hover:text-emerald-500 transition-colors first:rounded-l-2xl">{item.id}</td>
@@ -235,6 +250,7 @@ const Materials = () => {
                                     <td className="p-5">
                                         <span className="px-3 py-1.5 bg-white shadow-sm border border-slate-100 text-slate-600 rounded-xl text-xs font-bold">{item.nutrition_value || 'Menunggu Uji'}</span>
                                     </td>
+                                    <td className="p-5 text-sm font-bold text-slate-500">{item.incoming_date || '-'}</td>
                                     <td className="p-5 text-sm font-bold text-slate-500">{item.expiry_date}</td>
                                     <td className="p-5 text-right last:rounded-r-2xl">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
@@ -249,7 +265,7 @@ const Materials = () => {
                                 </tr>
                             ))}
                             {materials.length === 0 && !loading && (
-                                <tr><td colSpan={9} className="p-12 text-center text-slate-500 font-medium">Belum ada bahan baku logistik yang terdaftar</td></tr>
+                                <tr><td colSpan={10} className="p-12 text-center text-slate-500 font-medium">Belum ada bahan baku logistik yang terdaftar</td></tr>
                             )}
                         </tbody>
                     </table>

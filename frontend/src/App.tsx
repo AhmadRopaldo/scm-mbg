@@ -10,6 +10,7 @@ import Stocks from './pages/Stocks';
 import Logs from './pages/Logs';
 import DailyInput from './pages/DailyInput';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import { UserProvider, useUser } from './context/UserContext';
 
 function AppContent({ onLogout }: { onLogout: () => void }) {
@@ -54,13 +55,25 @@ function AppContent({ onLogout }: { onLogout: () => void }) {
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   return (
     <UserProvider>
       {isAuth ? (
         <AppContent onLogout={() => setIsAuth(false)} />
+      ) : showRegister ? (
+        <Register 
+          onToggleLogin={() => setShowRegister(false)} 
+          onRegisterSuccess={(msg) => setSuccessMsg(msg)}
+        />
       ) : (
-        <Login onLogin={() => setIsAuth(true)} />
+        <Login 
+          onLogin={() => setIsAuth(true)} 
+          onToggleRegister={() => setShowRegister(true)}
+          successMsg={successMsg}
+          clearSuccessMsg={() => setSuccessMsg('')}
+        />
       )}
     </UserProvider>
   );

@@ -50,6 +50,26 @@ const getCategoryIcon = (category: string) => {
     return <Package className="w-4 h-4" />;
 };
 
+const isExpired = (expiryDateStr: string) => {
+    if (!expiryDateStr) return false;
+    const expiry = new Date(expiryDateStr);
+    const today = new Date();
+    expiry.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    return expiry < today;
+};
+
+const isNearExpiry = (expiryDateStr: string, daysThreshold = 3) => {
+    if (!expiryDateStr) return false;
+    const expiry = new Date(expiryDateStr);
+    const today = new Date();
+    expiry.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= daysThreshold;
+};
+
 const Stocks = () => {
     const [stocks, setStocks] = useState<any[]>([]);
     const [selectedKitchen, setSelectedKitchen] = useState('k-1');
@@ -245,7 +265,31 @@ const Stocks = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto relative z-10">
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto relative z-10 flex-wrap">
+                    {(() => {
+                        const expiredCount = stocks.filter(stk => isExpired(stk.expiry_date)).length;
+                        if (expiredCount > 0) {
+                            return (
+                                <div className="bg-rose-600 text-white px-4 h-10 rounded-xl flex items-center gap-2.5 font-black border border-rose-500 shadow-md animate-bounce w-full sm:w-auto justify-center whitespace-nowrap shrink-0">
+                                    <AlertTriangle className="w-4 h-4 text-white animate-pulse" />
+                                    <span className="text-[13px]">{expiredCount} BAHAN KADALUARSA!</span>
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
+                    {(() => {
+                        const nearExpiryCount = stocks.filter(stk => isNearExpiry(stk.expiry_date) && !isExpired(stk.expiry_date)).length;
+                        if (nearExpiryCount > 0) {
+                            return (
+                                <div className="bg-amber-500 text-white px-4 h-10 rounded-xl flex items-center gap-2.5 font-black border border-amber-400 shadow-sm w-full sm:w-auto justify-center whitespace-nowrap shrink-0">
+                                    <AlertCircle className="w-4 h-4 text-white" />
+                                    <span className="text-[13px]">{nearExpiryCount} HAMPIR EXP</span>
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
                     {hasLowStock && (
                         <div className="bg-rose-500/20 text-rose-200 backdrop-blur-md px-4 h-10 rounded-xl flex items-center gap-2.5 font-bold border border-rose-500/40 shadow-sm animate-pulse w-full sm:w-auto justify-center whitespace-nowrap shrink-0">
                             <BellRing className="w-4 h-4 drop-shadow-sm" />
@@ -354,11 +398,27 @@ const Stocks = () => {
                                                 {getCategoryIcon(stk.category)}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-800 text-[14px] flex items-center gap-2 tracking-tight">
+                                                <p className="font-bold text-slate-800 text-[14px] flex items-center gap-2 tracking-tight flex-wrap">
                                                     {stk.name}
                                                     {isDanger && <AlertTriangle className="w-3 h-3 text-rose-500" strokeWidth={3} />}
+                                                    {isExpired(stk.expiry_date) && (
+                                                        <span className="px-1.5 py-0.5 bg-rose-100 border border-rose-200 text-rose-600 text-[8px] font-black rounded-md tracking-wider">KADALUARSA</span>
+                                                    )}
+                                                    {isNearExpiry(stk.expiry_date) && !isExpired(stk.expiry_date) && (
+                                                        <span className="px-1.5 py-0.5 bg-amber-100 border border-amber-200 text-amber-600 text-[8px] font-black rounded-md tracking-wider">HAMPIR EXP</span>
+                                                    )}
                                                 </p>
-                                                <p className="text-[10px] text-slate-400 font-medium mt-0.5 tracking-wide">ID: {stk.id.toUpperCase()}</p>
+                                                <p className="text-[10px] text-slate-400 font-medium mt-0.5 tracking-wide flex items-center gap-1.5 flex-wrap">
+                                                    <span>ID: {stk.id.toUpperCase()}</span>
+                                                    {stk.expiry_date && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span className={isExpired(stk.expiry_date) ? "text-rose-600 font-bold" : isNearExpiry(stk.expiry_date) ? "text-amber-600 font-bold" : ""}>
+                                                                Exp: {stk.expiry_date}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </p>
                                             </div>
                                         </div>
 
@@ -677,6 +737,65 @@ const Stocks = () => {
                                             </option>
                                         ))}
                                     </select>
+
+                                    {(() => {
+                                        const selectedUseStockItem = stocks.find(s => s.material_id === useForm.material_id);
+                                        if (!selectedUseStockItem) return null;
+                                        return (
+                                            <>
+                                                <div className="mt-3 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100/50 flex flex-col gap-2 text-xs font-bold text-slate-700 shadow-sm animate-in fade-in duration-300">
+                                                    <div className="flex justify-between">
+                                                        <span>📅 Tanggal Masuk:</span>
+                                                        <span className="text-[#1E5A44] font-black">{selectedUseStockItem.incoming_date || '-'}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span>⌛ Tanggal Kadaluarsa:</span>
+                                                        <span className={`${
+                                                            isExpired(selectedUseStockItem.expiry_date) 
+                                                                ? "text-rose-600 font-black animate-pulse" 
+                                                                : isNearExpiry(selectedUseStockItem.expiry_date) 
+                                                                    ? "text-amber-600 font-black" 
+                                                                    : "text-[#1E5A44] font-black"
+                                                        }`}>{selectedUseStockItem.expiry_date || '-'}</span>
+                                                    </div>
+                                                </div>
+
+                                                {(() => {
+                                                    const expDate = selectedUseStockItem.expiry_date;
+                                                    if (!expDate) return null;
+                                                    const expiry = new Date(expDate);
+                                                    const today = new Date();
+                                                    expiry.setHours(0,0,0,0);
+                                                    today.setHours(0,0,0,0);
+                                                    
+                                                    if (expiry < today) {
+                                                        return (
+                                                            <div className="mt-3 p-3 bg-rose-50 border border-rose-200/60 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2.5 shadow-sm animate-in fade-in duration-300">
+                                                                <svg className="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                </svg>
+                                                                <span>Peringatan: Bahan baku sudah kadaluarsa ({selectedUseStockItem.expiry_date})!</span>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    
+                                                    const diffTime = expiry.getTime() - today.getTime();
+                                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                                    if (diffDays >= 0 && diffDays <= 3) {
+                                                        return (
+                                                            <div className="mt-3 p-3 bg-amber-50 border border-amber-200/60 rounded-xl text-xs font-bold text-amber-700 flex items-center gap-2.5 shadow-sm animate-in fade-in duration-300">
+                                                                <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                                </svg>
+                                                                <span>Peringatan: Bahan baku hampir kadaluarsa ({diffDays} hari lagi)!</span>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })()}
+                                            </>
+                                        );
+                                    })()}
                                 </div>
 
                                 {/* Jumlah Terpakai */}

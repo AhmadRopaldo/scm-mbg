@@ -88,11 +88,11 @@ app.get('/api/v1/scm/materials', async (req, res) => {
 
 app.post('/api/v1/scm/materials', async (req, res) => {
     try {
-        const { id, name, category, unit, standard_price, quality_status, expiry_date } = req.body;
+        const { id, name, category, unit, standard_price, quality_status, expiry_date, incoming_date } = req.body;
         const newId = id || `mat-${Date.now()}`;
-        await db.query(`INSERT INTO m2_materials (id, name, category, unit, standard_price, quality_status, expiry_date) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [newId, name, category, unit, standard_price, quality_status, expiry_date]);
-        res.json({ id: newId, name, category, unit, standard_price, quality_status, expiry_date });
+        await db.query(`INSERT INTO m2_materials (id, name, category, unit, standard_price, quality_status, expiry_date, incoming_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [newId, name, category, unit, standard_price, quality_status, expiry_date, incoming_date]);
+        res.json({ id: newId, name, category, unit, standard_price, quality_status, expiry_date, incoming_date });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -100,9 +100,9 @@ app.post('/api/v1/scm/materials', async (req, res) => {
 
 app.put('/api/v1/scm/materials/:id', async (req, res) => {
     try {
-        const { name, category, unit, standard_price, quality_status, expiry_date } = req.body;
-        const [result] = await db.query(`UPDATE m2_materials SET name = ?, category = ?, unit = ?, standard_price = ?, quality_status = ?, expiry_date = ? WHERE id = ?`,
-            [name, category, unit, standard_price, quality_status, expiry_date, req.params.id]);
+        const { name, category, unit, standard_price, quality_status, expiry_date, incoming_date } = req.body;
+        const [result] = await db.query(`UPDATE m2_materials SET name = ?, category = ?, unit = ?, standard_price = ?, quality_status = ?, expiry_date = ?, incoming_date = ? WHERE id = ?`,
+            [name, category, unit, standard_price, quality_status, expiry_date, incoming_date, req.params.id]);
         res.json({ updated: result.affectedRows });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -122,7 +122,7 @@ app.delete('/api/v1/scm/materials/:id', async (req, res) => {
 app.get('/api/v1/scm/stocks/kitchen/:kitchenId', async (req, res) => {
     try {
         const [rows] = await db.query(`
-        SELECT s.id, s.kitchen_id, s.material_id, s.qty_available, s.min_stock_level, m.name, m.unit, m.category 
+        SELECT s.id, s.kitchen_id, s.material_id, s.qty_available, s.min_stock_level, m.name, m.unit, m.category, m.expiry_date, m.incoming_date, m.quality_status 
         FROM m2_kitchen_stocks s 
         JOIN m2_materials m ON s.material_id = m.id 
         WHERE s.kitchen_id = ?`,
@@ -857,6 +857,63 @@ Format output HARUS berupa JSON murni dengan skema berikut:
         to_buy.sort((a, b) => a.days_runway - b.days_runway);
         res.json({ to_process, to_buy });
 
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- API Otentikasi Pengguna ---
+app.post('/api/v1/auth/register', async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+        if (!name || !email || !password || !role) {
+            return res.status(400).json({ error: 'Semua field wajib diisi' });
+        }
+
+        // Cek apakah email sudah terdaftar
+        const [existingUsers] = await db.query('SELECT id FROM m2_users WHERE email = ?', [email]);
+        if (existingUsers.length > 0) {
+            return res.status(400).json({ error: 'Alamat email sudah terdaftar!' });
+        }
+
+        // Simpan user baru ke database
+        await db.query(
+            'INSERT INTO m2_users (name, email, password, role) VALUES (?, ?, ?, ?)',
+            [name, email, password, role]
+        );
+
+        res.json({
+            success: true,
+            message: 'Registrasi berhasil',
+            user: { name, email, role }
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/v1/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email dan password wajib diisi' });
+        }
+
+        // Verifikasi email dan password
+        const [users] = await db.query('SELECT * FROM m2_users WHERE email = ? AND password = ?', [email, password]);
+        if (users.length === 0) {
+            return res.status(401).json({ error: 'Email atau password salah!' });
+        }
+
+        const user = users[0];
+        res.json({
+            success: true,
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -1,31 +1,59 @@
 import { useState } from 'react';
 import { ShoppingCart, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import axios from 'axios';
 
-const Login = ({ onLogin }: { onLogin: () => void }) => {
+const Login = ({ onLogin, onToggleRegister, successMsg, clearSuccessMsg }: { 
+    onLogin: () => void; 
+    onToggleRegister: () => void;
+    successMsg?: string;
+    clearSuccessMsg?: () => void;
+}) => {
     const { updateProfile } = useUser();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if ((email === 'admin@gmail.com' || email === 'admin@scm-mbg.id') && password === '12345') {
-            updateProfile({
-                name: 'Admin Utama',
-                email: email,
-                role: 'Admin Pusat'
+        setError('');
+        if (clearSuccessMsg) clearSuccessMsg();
+
+        if (!email.trim() && !password.trim()) {
+            setError('Gagal! Anda harus mengisikan Alamat Email dan Kata Sandi.');
+            return;
+        }
+        if (!email.trim()) {
+            setError('Gagal! Anda harus mengisikan Alamat Email.');
+            return;
+        }
+        if (!password.trim()) {
+            setError('Gagal! Anda harus mengisikan Kata Sandi.');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const res = await axios.post('http://localhost:5000/api/v1/auth/login', {
+                email,
+                password
             });
-            onLogin(); // Validated!
-        } else if ((email === 'pemilik@gmail.com' || email === 'pemilik@scm-mbg.id') && password === '12345') {
-            updateProfile({
-                name: 'H. Rahmat Hidayat',
-                email: email,
-                role: 'Pemilik Yayasan'
-            });
-            onLogin(); // Validated!
-        } else {
-            setError('Email atau password salah!');
+
+            if (res.data.success) {
+                updateProfile({
+                    name: res.data.user.name,
+                    email: res.data.user.email,
+                    role: res.data.user.role
+                });
+                onLogin(); // Validated!
+            }
+        } catch (err: any) {
+            console.error(err);
+            setError(err.response?.data?.error || 'Koneksi ke server gagal, silakan coba lagi.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -83,7 +111,14 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                         <p className="text-slate-500 mt-2 font-medium">Silakan masukkan kredensial Anda untuk mengakses dashboard admin.</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+                    <form onSubmit={handleSubmit} noValidate className="space-y-6 mt-8">
+                        {successMsg && (
+                            <div className="bg-emerald-50 text-emerald-700 p-3 rounded-xl text-sm font-medium border border-emerald-100 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                {successMsg}
+                            </div>
+                        )}
+
                         {error && (
                             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium border border-red-100 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
@@ -133,9 +168,10 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
                         <button
                             type="submit"
-                            className="w-full flex items-center justify-center gap-2 bg-[#1E5A44] hover:bg-[#164232] text-white py-3.5 rounded-xl font-bold shadow-[0_8px_20px_rgba(30,90,68,0.2)] transition-all hover:-translate-y-0.5"
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-2 bg-[#1E5A44] hover:bg-[#164232] text-white py-3.5 rounded-xl font-bold shadow-[0_8px_20px_rgba(30,90,68,0.2)] transition-all hover:-translate-y-0.5 disabled:opacity-75"
                         >
-                            Masuk ke Dashboard
+                            {loading ? 'Masuk...' : 'Masuk ke Dashboard'}
                             <ArrowRight className="w-5 h-5 ml-1" />
                         </button>
                         
@@ -155,6 +191,13 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                             Login dengan Google
                         </button>
                     </form>
+
+                    <div className="text-center text-sm font-medium mt-4">
+                        <span className="text-slate-500">Belum memiliki akun? </span>
+                        <button type="button" onClick={onToggleRegister} className="font-bold text-emerald-600 hover:text-emerald-700 hover:underline">
+                            Daftar Akun Baru
+                        </button>
+                    </div>
 
                     <div className="mt-8 pt-8 flex items-center justify-between text-xs text-slate-500 font-medium border-t border-slate-100">
                         <span className="flex items-center gap-1.5 cursor-help">
